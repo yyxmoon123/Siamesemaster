@@ -23,7 +23,7 @@ print(opt)
 train_dataset = DRGdataset()
 
 train_dataloder = DataLoader(dataset=train_dataset, batch_size=1, num_workers=opt.numberwork)
-device = torch.device(opt.gpu if torch.cuda.is_available() else 'cpu')
+device = torch.device( 'cpu')
 
 if __name__ == '__main__':
     SiameseVgg19Net = SiameseVgg19Net().to(device)
@@ -32,21 +32,22 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(ae.parameters(), lr=0.001)
     lall = []
     i = 0
-    for epoch in range(opt.epoch):
-        for index, data in enumerate(train_dataloder):
-            Is = data[0].to(device)
-            Ig = data[1].to(device)
-            value = SiameseVgg19Net(Is, Ig)
-            value = dff.Cat(value)
+    loss = 0
+    with open('log.txt',"w+") as F:
+        for epoch in range(opt.epoch):
+            for index, data in enumerate(train_dataloder):
+                Is = data[0].to(device)
+                Ig = data[1].to(device)
+                value = SiameseVgg19Net(Is, Ig)
+                value = dff.Cat(value)
 
-            out = ae(value[0], value[1])
-            L_all = AELoss.L_all(out[0], out[1], value[0])
-            lall.append(L_all.item())
-            optimizer.zero_grad()  # 清空上一步的残余更新参数值
-            L_all.backward()  # 以训练集的误差进行反向传播, 计算参数更新值
-            optimizer.step()
-
-            print(index, Is.shape)
-        print('loss :'+str(lall[epoch]))
-        i = i + 1
+                out = ae(value[0], value[1])
+                L_all = AELoss.L_all(out[0], out[1], value[0])
+                loss = L_all.item()
+                optimizer.zero_grad()  # 清空上一步的残余更新参数值
+                L_all.backward()  # 以训练集的误差进行反向传播, 计算参数更新值
+                optimizer.step()
+            print('loss :'+str(loss))
+            F.write(str(loss))
+            i = i + 1
     torch.save(ae, './weight/ae%d.pt' % i)
