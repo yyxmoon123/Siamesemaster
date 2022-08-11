@@ -13,18 +13,19 @@ import models.AEloss as AELoss
 
 parser = argparse.ArgumentParser(description='SiameseNet')
 parser.add_argument('--input', action='store', default='./data', help='')
-parser.add_argument('--numberwork', action='store', default=0, help='')
+parser.add_argument('--numberwork', action='store', type=int, default=0, help='')
 parser.add_argument('--save_model', action='store', default='./weight', help='')
-parser.add_argument('--epoch', action='store', default=60, help='eopch')
-parser.add_argument('--gpu',action='store',default='cuda:1',help='')
-parser.add_argument('--batch_size',action='store',default=1,help='')
+parser.add_argument('--epoch', action='store', type=int, default=60, help='eopch')
+parser.add_argument('--gpu', action='store', default='cuda:1', help='')
+parser.add_argument('--batch_size', action='store', type=int, default=1, help='')
 opt = parser.parse_args()
 print(opt)
 
 train_dataset = DRGdataset()
 
-train_dataloder = DataLoader(dataset=train_dataset, batch_size=opt.batch_size, num_workers=opt.numberwork,shuffle=False)
-device = torch.device( 'cpu')
+train_dataloder = DataLoader(dataset=train_dataset, batch_size=opt.batch_size, num_workers=opt.numberwork,
+                             shuffle=False)
+device = torch.device('cpu')
 
 if __name__ == '__main__':
     SiameseVgg19Net = SiameseVgg19Net().to(device)
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     lall = []
     i = 0
     loss = 0
-    with open('log.txt',"w+") as F:
+    with open('log.txt', "w+") as F:
         for epoch in range(opt.epoch):
             for index, data in enumerate(train_dataloder):
                 Is = data[0].to(device)
@@ -49,7 +50,7 @@ if __name__ == '__main__':
                 L_all.backward()  # 以训练集的误差进行反向传播, 计算参数更新值
                 optimizer.step()
 
-            print('epoch:'+str(epoch)+'loss :'+str(loss))
+            print('epoch:' + str(epoch) + 'loss :' + str(loss))
             F.write(str(loss))
             i = i + 1
     torch.save(ae, './weight/ae%d.pt' % i)
