@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 optimizer.zero_grad()  # 清空上一步的残余更新参数值
                 L_all.backward()  # 以训练集的误差进行反向传播, 计算参数更新值
                 optimizer.step()
-            print('loss :'+str(loss))
+            print('epoch:'+str(epoch)+'loss :'+str(loss))
             F.write(str(loss))
             i = i + 1
     torch.save(ae, './weight/ae%d.pt' % i)
