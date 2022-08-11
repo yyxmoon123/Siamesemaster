@@ -36,22 +36,25 @@ if __name__ == '__main__':
     lall = []
     i = 0
     loss = 0
-    with open('log.txt', "w+") as F:
-        for epoch in range(opt.epoch):
-            for index, data in enumerate(train_dataloder):
-                Is = data[0].to(device)
-                Ig = data[1].to(device)
-                value = SiameseVgg19Net(Is, Ig)
-                value = dff.Cat(value)
+    ep = 0
+    for epoch in range(opt.epoch):
+        ep = epoch
+        for index, data in enumerate(train_dataloder):
+            Is = data[0].to(device)
+            Ig = data[1].to(device)
+            value = SiameseVgg19Net(Is, Ig)
+            value = dff.Cat(value)
 
-                out = ae(value[0], value[1])
-                L_all = AELoss.L_all(out[0], out[1], value[0])
-                loss = L_all.item()
-                optimizer.zero_grad()  # 清空上一步的残余更新参数值
-                L_all.backward()  # 以训练集的误差进行反向传播, 计算参数更新值
-                optimizer.step()
+            out = ae(value[0], value[1])
+            L_all = AELoss.L_all(out[0], out[1], value[0])
+            loss = L_all.item()
+            optimizer.zero_grad()  # 清空上一步的残余更新参数值
+            L_all.backward()  # 以训练集的误差进行反向传播, 计算参数更新值
+            optimizer.step()
 
-            print('epoch:' + str(epoch) + 'loss :' + str(loss))
-            F.write(str(loss))
-            i = i + 1
-    torch.save(ae, './weight/ae%d.pt' % i)
+        print('epoch:' + str(epoch) + 'loss :' + str(loss))
+        with open('log.txt', 'w') as F:
+            str1 = 'run' + str(epoch) + 'loss+' + str(loss)
+            F.write(str1)
+        i = i + 1
+torch.save(ae, './weight/ae%d.pt' % i)
