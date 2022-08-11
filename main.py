@@ -25,7 +25,8 @@ train_dataset = DRGdataset()
 
 train_dataloder = DataLoader(dataset=train_dataset, batch_size=opt.batch_size, num_workers=opt.numberwork,
                              shuffle=False)
-device = torch.device('cpu')
+
+device = torch.device(opt.gpu if torch.cuda.is_available() else 'cpu')
 
 if __name__ == '__main__':
     SiameseVgg19Net = SiameseVgg19Net().to(device)
