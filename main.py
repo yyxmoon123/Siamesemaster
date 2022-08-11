@@ -17,12 +17,13 @@ parser.add_argument('--numberwork', action='store', default=0, help='')
 parser.add_argument('--save_model', action='store', default='./weight', help='')
 parser.add_argument('--epoch', action='store', default=60, help='eopch')
 parser.add_argument('--gpu',action='store',default='cuda:1',help='')
+parser.add_argument('--batch_size',action='store',default=1,help='')
 opt = parser.parse_args()
 print(opt)
 
 train_dataset = DRGdataset()
 
-train_dataloder = DataLoader(dataset=train_dataset, batch_size=1, num_workers=opt.numberwork)
+train_dataloder = DataLoader(dataset=train_dataset, batch_size=opt.batch_size, num_workers=opt.numberwork,shuffle=False)
 device = torch.device( 'cpu')
 
 if __name__ == '__main__':
@@ -47,6 +48,7 @@ if __name__ == '__main__':
                 optimizer.zero_grad()  # 清空上一步的残余更新参数值
                 L_all.backward()  # 以训练集的误差进行反向传播, 计算参数更新值
                 optimizer.step()
+
             print('epoch:'+str(epoch)+'loss :'+str(loss))
             F.write(str(loss))
             i = i + 1
