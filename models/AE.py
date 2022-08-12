@@ -1,18 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
-
-
-# def conv1x1(in_planes, out_planes):
-#     """1x1 convolution"""
-#     return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=1)
-#
-#
-# class BasicBlock(nn.Module):
-#     def __init__(self, inchannel, outchannel):
-#         super(BasicBlock, self).__init__()
-#         self.conv1 = conv1x1(inchannel, outchannel)
-#         self.bn1 = nn.BatchNorm2d(outchannel)
-#         ###
+import torch.nn.init
+import numpy as np
 
 
 class AE(nn.Module):
@@ -44,6 +33,7 @@ class AE(nn.Module):
             nn.Conv2d(2952, 5504, kernel_size=(1, 1), stride=(1, 1)),
             nn.BatchNorm2d(5504),
         )
+        self._init_weight()
 
     def branch(self, x):
         x = F.relu(self.conv1(x), inplace=True)
@@ -61,4 +51,12 @@ class AE(nn.Module):
         Faeg = self.branch(x2)
         return Faes, Faeg
 
-
+    def _init_weight(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_uniform(m.weight)
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.BatchNorm2d):
+                    nn.init.constant_(m.weight, 1)
+                    nn.init.constant_(m.bias, 0)

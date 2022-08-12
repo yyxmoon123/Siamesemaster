@@ -96,10 +96,10 @@ class DFF():
         value = tens
         # print('resize前', value.shape)
         s1, s2, s3, s4 = value.shape[0], value.shape[1], value.shape[2], value.shape[3]
-        if s3 > 256:
-            value = interpolate(value, size=(256, 256))
-        elif s3 < 256:
-            value = nn.functional.upsample(value, size=(256, 256), mode='nearest')
+        if s3 >= 128:
+            value = interpolate(value, size=(128, 128))
+        elif s3 < 128:
+            value = nn.functional.upsample(value, size=(128, 128), mode='nearest')
         # print('resize后', value.shape)
         return value
 

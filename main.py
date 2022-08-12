@@ -18,6 +18,7 @@ parser.add_argument('--save_model', action='store', default='./weight', help='')
 parser.add_argument('--epoch', action='store', type=int, default=60, help='eopch')
 parser.add_argument('--gpu', action='store', default='cuda:1', help='')
 parser.add_argument('--batch_size', action='store', type=int, default=1, help='')
+parser.add_argument('--cpuswitch', action='store', type=bool, default=False)
 opt = parser.parse_args()
 print(opt)
 
@@ -25,8 +26,10 @@ train_dataset = DRGdataset()
 
 train_dataloder = DataLoader(dataset=train_dataset, batch_size=opt.batch_size, num_workers=opt.numberwork,
                              shuffle=False)
-
-device = torch.device(opt.gpu if torch.cuda.is_available() else 'cpu')
+if opt.cpuswitch:
+    device = torch.device('cpu')
+else:
+    device = torch.device(opt.gpu if torch.cuda.is_available() else 'cpu')
 
 if __name__ == '__main__':
     SiameseVgg19Net = SiameseVgg19Net().to(device)
@@ -38,14 +41,19 @@ if __name__ == '__main__':
     loss = 0
     ep = 0
     for epoch in range(opt.epoch):
+        print(epoch)
         ep = epoch
         for index, data in enumerate(train_dataloder):
+
             Is = data[0].to(device)
             Ig = data[1].to(device)
             value = SiameseVgg19Net(Is, Ig)
             value = dff.Cat(value)
-
+            if index % 10 == 0 and index == 0:
+                print('Fs:',value[0].shape)
             out = ae(value[0], value[1])
+            if index % 1 == 0 and index == 0:
+                print('FAEs',out[0].shape)
             L_all = AELoss.L_all(out[0], out[1], value[0])
             loss = L_all.item()
             optimizer.zero_grad()  # 清空上一步的残余更新参数值
