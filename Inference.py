@@ -36,48 +36,16 @@ transform = Transforms.Compose([
 
 
 if __name__ == '__main__':
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    #
-    # ae = AE()
-    # ae = ae.to(device)
-    SimaseNet = SiameseVgg19Net()
-    SimaseNet = SimaseNet.to(device)
-    mat1Path = './data/3.jpg'
-    mat2Path = './data/4.jpg'
-
-    mat1  = torch.from_numpy(cv2.imread(mat1Path,1))
-    mat1 = transform(mat1).astype('float32').to(device)
-    mat2 = cv2.imread(mat2Path,1)
-    mat2 = transform(mat2).to(device)
-
-    values = SimaseNet(mat1, mat2)
-
-    ##DFF
-    # DFF = DFF()
-    # FDs = []
-    # FDg = []
-    # for index, value in values.items():
-    #     for i, v in enumerate(value):
-    #         if (index == 'Fs'):
-    #             out1 = DFF.Patch(v)
-    #             FDs.append(out1)
-    #         elif (index == 'Fd'):
-    #             out2 = DFF.Patch(v)
-    #             FDg.append(out2)
-    #
-    # for i in range(len(FDs) - 1):
-    #     if i == 0:
-    #         FDs_out = np.concatenate((FDs[i], FDs[i + 1]), axis=3)
-    #         FDg_out = np.concatenate((FDg[i], FDg[i + 1]), axis=3)
-    #     else:
-    #         FDs_out = np.concatenate((FDs_out, FDs[i + 1]), axis=3)
-    #         FDg_out = np.concatenate((FDg_out, FDg[i + 1]), axis=3)
-    #
-    # FDs_out = torch.from_numpy(FDs_out).permute(0, 3, 1, 2).to(device)
-    # FDg_out = torch.from_numpy(FDg_out).permute(0, 3, 1, 2).to(device)
-    # ##
-    #
-    # FAE = AE(FDs_out, FDg_out)
-    # print(FAE[0].shape)
-    # criterion = AEloss.L_all(FAE[0], FAE[1], FDg_out)
-    # optimizer = torch.optim.Adam(AE.parameters())
+    # device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    # SimaseNet = SiameseVgg19Net()
+    # SimaseNet = SimaseNet.to(device)
+    # mat1Path = './data/3.jpg'
+    # mat2Path = './data/4.jpg'
+    # mat1  = torch.from_numpy(cv2.imread(mat1Path,1))
+    # mat1 = transform(mat1).astype('float32').to(device)
+    # mat2 = cv2.imread(mat2Path,1)
+    # mat2 = transform(mat2).to(device)
+    # values = SimaseNet(mat1, mat2)
+    ae = AE()
+    SiameseVgg19Net = SiameseVgg19Net()
+    

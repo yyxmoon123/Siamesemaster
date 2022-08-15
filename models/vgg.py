@@ -1,4 +1,5 @@
 import os
+import time
 
 import cv2
 import torch
@@ -67,10 +68,9 @@ class SiameseVgg19Net(nn.Module):
         )
 
         self.MaxPool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
-        #### sb论文 写都写不清楚，图也画不好
+
         mod = models.vgg19(pretrained=True)
         for i in range(len(self.model.state_dict().items())):
-            # print(list(mod.state_dict().items())[i][0], '\t', list(self.model.state_dict().items())[i][0])
             list(self.model.state_dict().items())[i][1][:] = list(mod.state_dict().items())[i][1][:]
 
     def branch(self, input):
@@ -181,16 +181,7 @@ def preprocess_image(cv2im, resize_im=True):
     im_as_var = Variable(im_as_ten, requires_grad=True)
     return im_as_var
 
-# if __name__ == '__main__':
-#
-#     mat3 = cv2.imread('./000.png', 1)
-#     mat4 = cv2.imread('./001.png', 1)
-#
-#     mat3 = preprocess_image(mat3)
-#     mat4 = preprocess_image(mat4)
-#     net = SiameseVgg19Net()
-#     values = net(mat3, mat4)
-#     DFF = DFF()
-#     values = DFF.Cat(values)
-#     FDs = values[0]
-#     FDg = values[0]
+
+if __name__ == '__main__':
+    start = time.clock()
+    end = time.clock()
