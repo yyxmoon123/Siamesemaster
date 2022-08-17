@@ -9,43 +9,62 @@ import cv2
 import torch
 from torchvision.transforms import Normalize
 
-
 import torchvision.transforms as Transforms
 from PIL import Image
 
 
+class Inference(nn.Module):
+    def __init__(self):
+        super(Inference, self).__init__()
+        self.ae = AE()
 
-def read_mat(path):
-    mat1 = cv2.imread(path, 2).astype('float32')
-    mat1 = cv2.cvtColor(mat1, cv2.COLOR_GRAY2BGR)
-    mat1 = mat1[None]
-    tor1 = torch.from_numpy(mat1)
-    tor1 = tor1.permute(0, 3, 1, 2)
-    return tor1
-
-
-def infer(FAEs, FDs):
-    pass
+    def re_size(self, Fd, Fae):
+        out = Fd - Fae
+        out = out.detach().cpu().numpy()
+        return out
 
 
 transform = Transforms.Compose([
-    Transforms.Resize((720, 720)),
-    Transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-    Transforms.ToTensor(),
+    # Transforms.Resize((720, 720)),
+    Transforms.ToTensor()
+    # Transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
 
+img_transform = Transforms.ToTensor()
 
 if __name__ == '__main__':
-    # device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    # SimaseNet = SiameseVgg19Net()
-    # SimaseNet = SimaseNet.to(device)
-    # mat1Path = './data/3.jpg'
-    # mat2Path = './data/4.jpg'
-    # mat1  = torch.from_numpy(cv2.imread(mat1Path,1))
-    # mat1 = transform(mat1).astype('float32').to(device)
-    # mat2 = cv2.imread(mat2Path,1)
-    # mat2 = transform(mat2).to(device)
-    # values = SimaseNet(mat1, mat2)
-    ae = AE()
+    # mat1 = cv2.imread('./data/mvtec/grid/test/metal_contamination/000.png', 1)
+    mat1 = cv2.imread('./models/000.png')
+    src = cv2.resize(mat1, (720, 720))
+    mat1 = transform(mat1)
+
+    mat1 = torch.unsqueeze(mat1, dim=0)
+    mat2 = mat1
+
+    Inference = Inference()
     SiameseVgg19Net = SiameseVgg19Net()
-    
+    SiameseVgg19Net.eval()
+    dff = DFF()
+    ae = torch.load('./weight/weight/ae50.pt', map_location='cpu')
+    ae.eval()
+    # grad =
+    print(ae.state_dict().keys())
+    value = SiameseVgg19Net(mat1, mat2)
+    value = dff.Cat(value)
+    out = ae(value[0], value[1])
+
+    inf = Inference.re_size(value[0], out[0])
+    inf = np.mean(inf, axis=1)
+    inf /= np.max(inf)
+    inf = 1.0 - inf
+    inf = np.squeeze(inf, axis=0)
+
+    inf = cv2.resize(inf, (720, 720), interpolation=cv2.INTER_LINEAR)
+    inf = np.uint8(255 * inf)
+
+    inf = cv2.applyColorMap(inf, cv2.COLORMAP_JET)
+    src = src.astype('uint8')
+    out = np.hstack((src, inf))
+    cv2.imshow('11', out)
+    cv2.waitKey(0)
+    print(1)

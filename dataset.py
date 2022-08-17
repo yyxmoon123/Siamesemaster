@@ -72,5 +72,5 @@ class DRGdataset(Dataset):
 if __name__ == '__main__':
     path = './models/000.png'
     DRGdataset = DRGdataset()
-    print(DRGdataset[0][1].shape)
+    print(DRGdataset[0][1])
     img = cv2.imread(path, 1)
